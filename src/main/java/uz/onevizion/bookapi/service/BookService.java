@@ -3,11 +3,13 @@ package uz.onevizion.bookapi.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.RestController;
 import uz.onevizion.bookapi.db.entity.BookEntity;
-import uz.onevizion.bookapi.domain.BookDto;
 import uz.onevizion.bookapi.db.respository.BookRepository;
+import uz.onevizion.bookapi.domain.AuthorBookDto;
+import uz.onevizion.bookapi.domain.BookDto;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,6 +29,21 @@ public class BookService {
 
     public BookDto create(BookDto bookDto) {
         return bookRepository.createBook(bookDto);
+    }
+
+    public List<AuthorBookDto> findAuthorBooks() {
+        final List<BookEntity> bookEntities = bookRepository.findAll();
+        final List<AuthorBookDto> books = new ArrayList<>();
+
+        bookEntities
+                .stream()
+                .collect(Collectors.groupingBy(BookEntity::getAuthor, Collectors.mapping(BookService::convertToDto, Collectors.toList())))
+                .forEach((author, bookList) -> {
+                    AuthorBookDto authorBookDto = new AuthorBookDto(author, bookList);
+                    books.add(authorBookDto);
+                });
+
+        return books;
     }
 
     private static BookDto convertToDto(BookEntity m) {
