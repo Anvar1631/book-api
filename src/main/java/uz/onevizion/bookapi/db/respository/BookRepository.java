@@ -11,8 +11,4 @@ public interface BookRepository {
     List<BookEntity> findAll();
 
     BookDto createBook(BookDto book);
-
-    List<BookDto> findByAuthor();
-
-    List<BookDto> findBySymbol(String symbol);
 }

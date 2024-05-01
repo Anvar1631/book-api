@@ -5,10 +5,15 @@ import org.springframework.web.bind.annotation.RestController;
 import uz.onevizion.bookapi.db.entity.BookEntity;
 import uz.onevizion.bookapi.db.respository.BookRepository;
 import uz.onevizion.bookapi.domain.AuthorBookDto;
+import uz.onevizion.bookapi.domain.AuthorDto;
 import uz.onevizion.bookapi.domain.BookDto;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.ToIntFunction;
+import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 @RestController
@@ -38,12 +43,40 @@ public class BookService {
         bookEntities
                 .stream()
                 .collect(Collectors.groupingBy(BookEntity::getAuthor, Collectors.mapping(BookService::convertToDto, Collectors.toList())))
-                .forEach((author, bookList) -> {
-                    AuthorBookDto authorBookDto = new AuthorBookDto(author, bookList);
-                    books.add(authorBookDto);
-                });
+                .forEach((author, bookList) -> books.add(new AuthorBookDto(author, bookList)));
 
         return books;
+    }
+
+    public List<AuthorDto> getAuthorsBySymbol(String symbol) {
+        List<BookEntity> books = bookRepository.findAll();
+
+        return books
+                .stream()
+                .map(book -> getAuthorDto(symbol, book))
+                .filter(f -> f.getBook_count() > 0)
+                .collect(Collectors.groupingBy(AuthorDto::getName, Collectors.summingInt(AuthorDto::getBook_count)))
+                .entrySet()
+                .stream()
+                .map((each) -> new AuthorDto(each.getKey(), each.getValue()))
+                .sorted((e1, e2) -> e2.getBook_count().compareTo(e1.getBook_count()))
+                .limit(10)
+                .collect(Collectors.toList());
+    }
+
+    private static AuthorDto getAuthorDto(String symbol, BookEntity book) {
+        if (!book.getTitle().contains(symbol)) {
+            return new AuthorDto(book.getAuthor(), 0);
+        }
+
+        int count = (int) book.getTitle()
+                .chars()
+                .filter(ch -> Character
+                        .toString(ch)
+                        .equalsIgnoreCase(symbol))
+                .count();
+
+        return new AuthorDto(book.getAuthor(), count);
     }
 
     private static BookDto convertToDto(BookEntity m) {

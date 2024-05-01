@@ -21,7 +21,6 @@ public class JdbcBookRepository implements BookRepository {
     private final BookMapper bookMapper;
     private final AtomicLong idGenerator;
 
-
     public JdbcBookRepository(NamedParameterJdbcTemplate namedParameterJdbcTemplate,
                               JdbcTemplate jdbcTemplate,
                               BookMapper bookMapper) {
@@ -45,15 +44,5 @@ public class JdbcBookRepository implements BookRepository {
         simpleJdbcInsert.execute(book.toMap());
 
         return book;
-    }
-
-    @Override
-    public List<BookDto> findByAuthor() {
-        return null;
-    }
-
-    @Override
-    public List<BookDto> findBySymbol(String symbol) {
-        return null;
     }
 }

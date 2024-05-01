@@ -2,13 +2,11 @@ package uz.onevizion.bookapi.domain;
 
 import lombok.*;
 
-import java.util.List;
-
 @Setter
 @Getter
-@AllArgsConstructor
 @NoArgsConstructor
-public class AuthorBookDto {
+@AllArgsConstructor
+public class AuthorDto {
     private String name;
-    private List<BookDto> books;
+    private Integer book_count;
 }
