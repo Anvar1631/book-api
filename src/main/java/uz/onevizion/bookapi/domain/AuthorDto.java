@@ -8,5 +8,5 @@ import lombok.*;
 @AllArgsConstructor
 public class AuthorDto {
     private String name;
-    private Integer book_count;
+    private Integer bookCount;
 }

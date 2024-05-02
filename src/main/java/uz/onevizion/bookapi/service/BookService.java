@@ -9,11 +9,7 @@ import uz.onevizion.bookapi.domain.AuthorDto;
 import uz.onevizion.bookapi.domain.BookDto;
 
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.ToIntFunction;
-import java.util.function.ToLongFunction;
 import java.util.stream.Collectors;
 
 @RestController
@@ -54,12 +50,12 @@ public class BookService {
         return books
                 .stream()
                 .map(book -> getAuthorDto(symbol, book))
-                .filter(f -> f.getBook_count() > 0)
-                .collect(Collectors.groupingBy(AuthorDto::getName, Collectors.summingInt(AuthorDto::getBook_count)))
+                .filter(f -> f.getBookCount() > 0)
+                .collect(Collectors.groupingBy(AuthorDto::getName, Collectors.summingInt(AuthorDto::getBookCount)))
                 .entrySet()
                 .stream()
                 .map((each) -> new AuthorDto(each.getKey(), each.getValue()))
-                .sorted((e1, e2) -> e2.getBook_count().compareTo(e1.getBook_count()))
+                .sorted((e1, e2) -> e2.getBookCount().compareTo(e1.getBookCount()))
                 .limit(10)
                 .collect(Collectors.toList());
     }
